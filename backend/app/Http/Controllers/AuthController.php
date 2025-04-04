@@ -70,4 +70,23 @@ class AuthController extends Controller
             );
         }
     }
+
+    public function logout()
+    {
+        try {
+            Auth::logout();
+
+            return responseMessage(
+                true,
+                200,
+                'Successfully logged out'
+            );
+        } catch (\Throwable $e) {
+            return responseMessage(
+                false,
+                401,
+                $e->getMessage()
+            );
+        }
+    }
 }
