@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use App\Models\LoginLog;
+use Illuminate\Support\Facades\Http;
 
 class AuthService extends Service
 {
@@ -43,10 +45,16 @@ class AuthService extends Service
                     false,
                     "Email or Password not correct"
                 );
-
             }
+
+
             $user = Auth::user();
             $user->token = $token;
+
+            $requestIp = request()->ip();
+            $ip = $requestIp === '127.0.0.1' ? env('REAL_IP', '127.0.0.1') : $requestIp;
+
+            self::getUserGeoLocation($ip, $user->id);
 
             return self::return(
                 true,
@@ -78,5 +86,18 @@ class AuthService extends Service
                 $e->getMessage()
             );
         }
+    }
+
+    public static function getUserGeoLocation($ip, $user_id){
+        $location = Http::get("https://ipapi.co/{$ip}/json/")->json();
+
+        LoginLog::create([
+            'user_id' => $user_id,
+            'ip_address' => $ip,
+            'country' => $location['country_name'] ?? null,
+            'city' => $location['city'] ?? null,
+            'latitude'=> $location['latitude'] ?? null,
+            'longitude' => $location['longitude'] ?? null,
+        ]);
     }
 }
