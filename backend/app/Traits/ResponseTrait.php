@@ -2,21 +2,33 @@
 
 namespace App\Traits;
 
+use illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+
 trait ResponseTrait
 {
-    public function successResponse($data, $code = 200)
+    public function returnResponse($success, $message, $data = null, $code = null)
     {
+        if (!$code) {
+            $code = $success ? 200 : 500;
+        }
+
         return response()->json([
-            "success" => true,
+            "success" => $success,
+            "message" => $message,
             "data" => $data
         ], $code);
     }
 
-    public function errorResponse($error, $code = 500)
+    protected function failedValidation(Validator $validator)
     {
-        return response()->json([
-            "success" => false,
-            "error" => $error
-        ], $code);
+        throw new HttpResponseException(
+            $this->returnResponse(
+                false,
+                "Failed Validation",
+                $validator->errors(),
+                422
+            )
+        );
     }
 }
