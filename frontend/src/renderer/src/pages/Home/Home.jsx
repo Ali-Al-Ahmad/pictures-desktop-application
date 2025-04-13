@@ -1,22 +1,26 @@
-import { useSelector } from 'react-redux'
 import './Home.css'
+import image1 from '../../assets/nature1.jpg'
+import image2 from '../../assets/nature2.jpg'
+import image3 from '../../assets/nature3.jpg'
+
 const Home = () => {
-  const user = useSelector((global) => global.user)
+  const images = [
+    { id: 1, src: image1, alt: 'Image 1' },
+    { id: 2, src: image2, alt: 'Image 2' },
+    { id: 3, src: image3, alt: 'Image 3' }
+  ]
 
   return (
-    <div className="home-page">
-      <h1>home1</h1>
-      <h1>home2</h1>
-      <h1>home3</h1>
-      <h1>home4</h1>
-      <h1>home5</h1>
-      <h1>home</h1>
-      <h1>home</h1>
-      <h1>home</h1>
-      <h1>{user?.id}</h1>
-      <h1>{user?.full_name}</h1>
-      <h1>{user?.email}</h1>
-      <h1>{user?.token}</h1>
+    <div className="gallery">
+      {images.map((image) => (
+        <div key={image.id} className="image-container">
+          <img src={image.src} alt={image.alt} className="image" />
+          <div className="button-container">
+            <button className="edit-button">Edit</button>
+            <button className="delete-button">Delete</button>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
