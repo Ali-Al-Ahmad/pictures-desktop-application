@@ -1,0 +1,19 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+:root {
+  --primary: #DF7DB4;
+  --darker-primary: #FBC2E2;
+  --white-grey: #e8e8e8;
+  --text-color: #333333;
+  --border-color: #ccc;
+}
+
+a {
+  text-decoration: none;
+  color: white;
+}

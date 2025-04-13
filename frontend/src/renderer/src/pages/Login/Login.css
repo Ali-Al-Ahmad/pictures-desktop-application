@@ -1,0 +1,11 @@
+.register-page form p {
+  justify-self: flex-start;
+  width: 100%;
+  font-size: 0.8em;
+  margin-top: 5px;
+}
+
+.login-signup-text {
+  color: rgb(3, 97, 164);
+  text-decoration: underline;
+}
