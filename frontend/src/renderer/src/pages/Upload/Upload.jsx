@@ -1,6 +1,8 @@
+import { useSelector } from 'react-redux'
 import './Upload.css'
 
 const Upload = () => {
+  const user = useSelector((global) => global.user)
   return (
     <div>
       <h1>Upload1</h1>
@@ -11,10 +13,10 @@ const Upload = () => {
       <h1>Upload</h1>
       <h1>Upload</h1>
       <h1>Upload</h1>
-      <h1>Upload</h1>
-      <h1>Upload</h1>
-      <h1>Upload</h1>
-      <h1>Upload</h1>
+      <h1>{user?.id}</h1>
+      <h1>{user?.full_name}</h1>
+      <h1>{user?.email}</h1>
+      <h1>{user?.token}</h1>
     </div>
   )
 }

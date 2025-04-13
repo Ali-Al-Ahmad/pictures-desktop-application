@@ -3,8 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { logout } from '../../utils/LogoutHook'
 import './Navbar.css'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
+import { removeUser } from '../../redux/slices/userSlice'
 
 const Navbar = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
   const currentPath = location.pathname
@@ -13,6 +16,7 @@ const Navbar = () => {
   const logoutApp = async () => {
     const logoutReturn = await logout()
     if (logoutReturn) {
+      dispatch(removeUser())
       navigate('/')
     }
   }
