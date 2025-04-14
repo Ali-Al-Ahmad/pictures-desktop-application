@@ -3,14 +3,15 @@
   margin-top: 70px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
   padding: 50px;
   gap: 25px;
 }
 
 .image-container {
   flex: 1 1 calc(30% - 50px);
-  min-height: 300px;
+  height: 300px;
+  max-width: 45%;
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -80,5 +81,8 @@
 @media (max-width: 768px) {
   .image-container {
     flex: 1 1 100%;
+  }
+  .image-container {
+    max-width: 100%;
   }
 }
