@@ -10,6 +10,7 @@ const Home = () => {
     ipcRenderer.send('get-images')
 
     ipcRenderer.on('get-images-response', (event, { success, images }) => {
+      console.log(images);
       if (success) {
         setImages(images)
       } else {
