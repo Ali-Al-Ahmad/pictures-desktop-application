@@ -15,7 +15,7 @@ const Home = () => {
       {images.map((image) => (
         <div key={image.id} className="image-container">
           <img src={image.src} alt={image.alt} className="image" />
-          <div className="button-container">
+          <div className="button-container-home">
             <button className="edit-button">Edit</button>
             <button className="delete-button">Delete</button>
           </div>
