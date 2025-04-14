@@ -1,3 +1,84 @@
-.home-page{
+
+.gallery {
   margin-top: 70px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 50px;
+  gap: 25px;
+}
+
+.image-container {
+  flex: 1 1 calc(30% - 50px);
+  min-height: 300px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--white-grey);
+  margin-bottom: 20px;
+  transition: transform 0.3s;
+}
+
+.image-container:hover {
+  transform: scale(1.05);
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.button-container-home {
+  padding: 5px 5%;
+  width: 100%;
+  position: absolute;
+  bottom: 10px;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.image-container:hover .button-container-home {
+  opacity: 1;
+}
+
+.edit-button,
+.delete-button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  width: 100%;
+  transition: background-color 0.3s;
+}
+
+.edit-button {
+  background-color: var(--primary);
+}
+
+.edit-button:hover {
+  background-color: var(--darker-primary);
+}
+
+.delete-button {
+  background-color: #d2d2d2;
+  color: var(--primary);
+}
+
+.delete-button:hover {
+  background-color: #9e9e9e;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .image-container {
+    flex: 1 1 100%;
+  }
 }

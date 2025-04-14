@@ -5,8 +5,11 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { Link } from 'react-router-dom'
 import './Login.css'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../../redux/slices/userSlice'
 
 const Login = () => {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     email: 'user@gmail.com',
@@ -33,6 +36,7 @@ const Login = () => {
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.data.token)
+        dispatch(setUser(response.data.data))
         toast.success(response.data.message)
 
         navigate('/home')
