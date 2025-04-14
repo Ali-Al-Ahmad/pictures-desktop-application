@@ -2,6 +2,8 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import fs from 'fs'
+import path from 'path'
 
 function createWindow() {
   // Create the browser window.
@@ -63,6 +65,57 @@ app.whenReady().then(() => {
   })
 })
 
+const savedImagesPath = '../../src/renderer/src/assets/images'
+//upload-image-localy
+ipcMain.on('save-image', (event, { imageData, imageName }) => {
+  const base64Data = imageData.replace(/^data:image\/(jpg|jpeg|png|gif|webp);base64,/, '')
+  const filePath = path.join(__dirname, savedImagesPath, imageName)
+
+  fs.writeFile(filePath, base64Data, 'base64', (err) => {
+    if (err) {
+      console.error('Error saving file:', err)
+      event.reply('save-image-response', { success: false, error: err.message })
+    } else {
+      console.log('File saved successfully:', filePath)
+      event.reply('save-image-response', { success: true, path: filePath })
+    }
+  })
+})
+
+//get-image-localy
+ipcMain.on('get-images', (event) => {
+  const imagesDir = path.join(__dirname, savedImagesPath)
+
+  fs.readdir(imagesDir, (err, files) => {
+    if (err) {
+      console.error('Error reading images directory:', err)
+      event.reply('get-images-response', { success: false, error: err.message })
+      return
+    }
+
+    const imageFiles = files.filter((file) => /\.(jpg|jpeg|png|gif|webp)$/.test(file))
+    const imagePaths = imageFiles.map((file) => path.join('../../../src/assets/images/', file))
+
+    event.reply('get-images-response', { success: true, images: imagePaths })
+  })
+})
+
+//delete-image-localy
+ipcMain.on('delete-image', (event, imageName) => {
+  const filePath = path.join(__dirname, savedImagesPath, imageName)
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err)
+      event.reply('delete-image-response', { success: false, error: err.message })
+    } else {
+      console.log('File deleted successfully:', filePath)
+      event.reply('delete-image-response', { success: true })
+    }
+  })
+})
+
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
@@ -74,3 +127,5 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+

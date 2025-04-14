@@ -2,10 +2,12 @@ import './Upload.css'
 import uploadIcon from '../../assets/uploadIcon.svg'
 import { useRef, useState } from 'react'
 
+const { ipcRenderer } = window.electron
+
 const Upload = () => {
   const fileInputRef = useRef(null)
   const [imagePreview, setImagePreview] = useState(null)
-
+  const [imageName, setImageName] = useState('')
   const handleUploadClick = () => {
     fileInputRef.current.click()
   }
@@ -17,8 +19,18 @@ const Upload = () => {
       const reader = new FileReader()
       reader.onloadend = () => {
         setImagePreview(reader.result)
+        setImageName(file.name)
       }
       reader.readAsDataURL(file)
+    }
+  }
+  const handleSave = () => {
+    if (imagePreview && imageName) {
+      const imageDataWithPrefix = `data:image/png;base64,${imagePreview.split(',')[1]}`
+
+      ipcRenderer.send('save-image', { imageData: imageDataWithPrefix, imageName })
+      setImagePreview(null)
+      alert('Image saved successfully!')
     }
   }
 
@@ -46,7 +58,12 @@ const Upload = () => {
             />
           </div>
           <div className="button-container-upload">
-            <button type="button" className="save-button">
+            <button
+              type="button"
+              className="save-button"
+              disabled={!imagePreview}
+              onClick={() => handleSave()}
+            >
               Save
             </button>
             <button type="button" className="cancel-button" onClick={() => setImagePreview(null)}>
