@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import path from 'path'
+import Jimp from 'jimp'
 
 function createWindow() {
   // Create the browser window.
@@ -17,7 +18,7 @@ function createWindow() {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
       webSecurity: false,
-      contextIsolation: true
+      contextIsolation: false
     }
   })
 
@@ -113,6 +114,119 @@ ipcMain.on('delete-image', (event, imageName) => {
       event.reply('delete-image-response', { success: true })
     }
   })
+})
+
+ipcMain.on('edit-image', async (event, { imagePath, bufferBase64, action, options }) => {
+  try {
+    let image
+    let originBuff
+
+    if (bufferBase64) {
+      const buffer = Buffer.from(bufferBase64, 'base64')
+      image = await Jimp.read(buffer)
+    } else if (imagePath) {
+      const filePath = path.join(__dirname, savedImagesPath, imagePath)
+
+      image = await Jimp.read(filePath)
+      originBuff = await image.getBufferAsync(Jimp.MIME_PNG)
+    } else {
+      throw new Error('No imagePath or buffer provided')
+    }
+
+    switch (action) {
+      case 'rotate':
+        image.rotate(options?.degrees || -90)
+        break
+
+      case 'greyscale':
+        image.greyscale()
+        break
+
+      case 'crop': {
+        const { x, y, width, height } = options
+        const croppedImage = image.clone().crop(x, y, width, height)
+        const croppedBuffer = await croppedImage.getBufferAsync(Jimp.MIME_PNG)
+        const croppedBase64 = `data:image/png;base64,${croppedBuffer.toString('base64')}`
+
+        event.reply('edit-image-response', {
+          success: true,
+          base64: croppedBase64,
+          buffer: croppedBuffer.toString('base64')
+        })
+        return
+      }
+
+      case 'watermark': {
+        const watermarkText = options?.text || 'PICSART'
+        const font = await Jimp.loadFont(Jimp.FONT_SANS_64_BLACK)
+        const opacity = 0.2
+
+        const watermarkLayer = new Jimp(image.bitmap.width, image.bitmap.height, 0x00000000)
+
+        watermarkLayer.print(
+          font,
+          0,
+          0,
+          {
+            text: watermarkText,
+            alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+            alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
+          },
+          image.bitmap.width,
+          image.bitmap.height
+        )
+
+        watermarkLayer.rotate(-45, false)
+        watermarkLayer.opacity(opacity)
+        image.composite(watermarkLayer, 0, 0)
+        break
+      }
+
+      default:
+    }
+    const buffer = await image.getBufferAsync(Jimp.MIME_PNG)
+    const base64 = `data:image/png;base64,${buffer.toString('base64')}`
+
+    event.reply('edit-image-response', {
+      success: true,
+      base64,
+      buffer: buffer.toString('base64'),
+      originBuff
+    })
+  } catch (err) {
+    console.error('Edit error:', err)
+    event.reply('edit-image-response', {
+      success: false,
+      err: err.message
+    })
+  }
+})
+
+ipcMain.on('save-edited-image', (event, { imageName, bufferBase64 }) => {
+  try {
+    const buffer = Buffer.from(bufferBase64, 'base64')
+    const savePath = path.join(__dirname, savedImagesPath, imageName)
+
+    fs.writeFileSync(savePath, buffer)
+
+    event.reply('edit-image-response', { success: true })
+  } catch (err) {
+    console.error('Error saving image:', err)
+    event.reply('edit-image-response', { success: false, err: err.message })
+  }
+})
+
+ipcMain.on('reset-image', (event, { imageName }) => {
+  const imagePath = path.join(__dirname, savedImagesPath, imageName)
+
+  try {
+    const buffer = fs.readFileSync(imagePath)
+    const base64 = `data:image/png;base64,${buffer.toString('base64')}`
+    event.reply('reset-image-response', { success: true, base64, buffer })
+  } catch (err) {
+    console.error('Error reading original image for reset:', err)
+    event.reply('reset-image-response', { success: false })
+  }
 })
 
 
