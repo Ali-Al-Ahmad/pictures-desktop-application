@@ -216,6 +216,19 @@ ipcMain.on('save-edited-image', (event, { imageName, bufferBase64 }) => {
   }
 })
 
+ipcMain.on('reset-image', (event, { imageName }) => {
+  const imagePath = path.join(__dirname, savedImagesPath, imageName)
+
+  try {
+    const buffer = fs.readFileSync(imagePath)
+    const base64 = `data:image/png;base64,${buffer.toString('base64')}`
+    event.reply('reset-image-response', { success: true, base64, buffer })
+  } catch (err) {
+    console.error('Error reading original image for reset:', err)
+    event.reply('reset-image-response', { success: false })
+  }
+})
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
