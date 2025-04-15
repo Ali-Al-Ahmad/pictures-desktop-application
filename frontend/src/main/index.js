@@ -202,6 +202,21 @@ ipcMain.on('edit-image', async (event, { imagePath, bufferBase64, action, option
   }
 })
 
+ipcMain.on('save-edited-image', (event, { imageName, bufferBase64 }) => {
+  try {
+    const buffer = Buffer.from(bufferBase64, 'base64')
+    const savePath = path.join(__dirname, savedImagesPath, imageName)
+
+    fs.writeFileSync(savePath, buffer)
+
+    event.reply('edit-image-response', { success: true })
+  } catch (err) {
+    console.error('Error saving image:', err)
+    event.reply('edit-image-response', { success: false, err: err.message })
+  }
+})
+
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
