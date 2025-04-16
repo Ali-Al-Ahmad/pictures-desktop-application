@@ -2,7 +2,7 @@ import './Upload.css'
 import uploadIcon from '../../assets/uploadIcon.svg'
 import { useRef, useState } from 'react'
 
-const { ipcRenderer } = window.electron
+const ipcRenderer = window?.electron?.ipcRenderer ?? null
 
 const Upload = () => {
   const fileInputRef = useRef(null)

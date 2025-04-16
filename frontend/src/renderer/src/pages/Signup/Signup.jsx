@@ -30,6 +30,8 @@ const Signup = () => {
       console.log('response: ', response)
 
       localStorage.setItem('token', response.data.data.token)
+      localStorage.setItem('user_id', response.data.data.id)
+
       toast.success(response.data.message)
 
       navigate('/home')

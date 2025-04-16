@@ -27,6 +27,16 @@ const Navbar = () => {
           <div className="logo">Picsart</div>
         </Link>
         <div className="nav-items">
+          {localStorage.getItem('token') && (
+            <Link
+              to="/chats"
+              className={currentPath === '/chats' && !isHover ? 'nav-link active-tab' : 'nav-link'}
+              onMouseOver={() => setIsHover(true)}
+              onMouseOut={() => setIsHover(false)}
+            >
+              <p>Chats</p>
+            </Link>
+          )}
           {/* if User Not LoggedIn show signup/login */}
           {!localStorage.getItem('token') && (
             <Link to={currentPath === '/signup' ? '/' : 'signup'} className="nav-link">
