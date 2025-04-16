@@ -3,7 +3,7 @@ import Cropper from 'react-easy-crop'
 import getCroppedImg from '../../utils/cropImage'
 import './Home.css'
 
-const { ipcRenderer } = window.electron
+const ipcRenderer = window?.electron?.ipcRenderer ?? null
 
 const Home = () => {
   const [images, setImages] = useState([])
@@ -20,10 +20,10 @@ const Home = () => {
   useEffect(() => {
     const fetchImages = () => {
       setLoading(true)
-      ipcRenderer.send('get-images')
+      ipcRenderer?.send('get-images')
     }
 
-    ipcRenderer.on('get-images-response', (event, { success, images }) => {
+    ipcRenderer?.on('get-images-response', (event, { success, images }) => {
       if (success) setImages(images)
       setLoading(false)
     })
@@ -31,13 +31,13 @@ const Home = () => {
     fetchImages()
 
     return () => {
-      ipcRenderer.removeAllListeners('get-images-response')
+      ipcRenderer?.removeAllListeners('get-images-response')
     }
   }, [])
 
   const openEditModal = useCallback((imagePath) => {
     setSelectedImagePath(imagePath)
-    ipcRenderer.send('edit-image', { imagePath, action: '' })
+    ipcRenderer?.send('edit-image', { imagePath, action: '' })
 
     const handleEditResponse = (event, { success, base64, buffer }) => {
       if (success) {
@@ -46,10 +46,10 @@ const Home = () => {
       }
     }
 
-    ipcRenderer.on('edit-image-response', handleEditResponse)
+    ipcRenderer?.on('edit-image-response', handleEditResponse)
 
     return () => {
-      ipcRenderer.removeListener('edit-image-response', handleEditResponse)
+      ipcRenderer?.removeListener('edit-image-response', handleEditResponse)
     }
   }, [])
 
@@ -62,7 +62,7 @@ const Home = () => {
       const croppedImage = await getCroppedImg(previewBase64, croppedAreaPixels)
       const croppedBase64 = croppedImage.split(',')[1]
 
-      ipcRenderer.send('edit-image', {
+      ipcRenderer?.send('edit-image', {
         bufferBase64: croppedBase64,
         action: 'crop',
         options: {
@@ -87,7 +87,7 @@ const Home = () => {
         setIsGrayscale((prev) => !prev)
       }
 
-      ipcRenderer.send('edit-image', {
+      ipcRenderer?.send('edit-image', {
         bufferBase64: previewBase64.replace(/^data:image\/\w+;base64,/, ''),
         action
       })
@@ -101,10 +101,10 @@ const Home = () => {
         }
       }
 
-      ipcRenderer.on('edit-image-response', handleEditResponse)
+      ipcRenderer?.on('edit-image-response', handleEditResponse)
 
       return () => {
-        ipcRenderer.removeListener('edit-image-response', handleEditResponse)
+        ipcRenderer?.removeListener('edit-image-response', handleEditResponse)
       }
     },
     [bufferBase64, previewBase64, isGrayscale]
@@ -112,7 +112,7 @@ const Home = () => {
 
   const resetImage = () => {
     const imageName = selectedImagePath.split('/').pop()
-    ipcRenderer.send('reset-image', { imageName })
+    ipcRenderer?.send('reset-image', { imageName })
   }
 
   useEffect(() => {
@@ -126,16 +126,16 @@ const Home = () => {
       }
     }
 
-    ipcRenderer.on('reset-image-response', handleResetResponse)
+    ipcRenderer?.on('reset-image-response', handleResetResponse)
 
     return () => {
-      ipcRenderer.removeListener('reset-image-response', handleResetResponse)
+      ipcRenderer?.removeListener('reset-image-response', handleResetResponse)
     }
   }, [])
 
   const saveEditedImage = () => {
     const imageName = selectedImagePath.split('/').pop()
-    ipcRenderer.send('save-edited-image', { imageName, bufferBase64 })
+    ipcRenderer?.send('save-edited-image', { imageName, bufferBase64 })
     closeModal()
   }
 
@@ -151,8 +151,8 @@ const Home = () => {
     const confirmed = confirm('Are you sure you want to delete this image?')
     if (confirmed) {
       const imageName = imagePath.split('/').pop()
-      ipcRenderer.send('delete-image', imageName)
-      ipcRenderer.once('delete-image-response', (event, { success }) => {
+      ipcRenderer?.send('delete-image', imageName)
+      ipcRenderer?.once('delete-image-response', (event, { success }) => {
         if (success) {
           setImages((prev) => prev.filter((img) => img !== imagePath))
         }

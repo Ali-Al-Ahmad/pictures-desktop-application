@@ -36,6 +36,8 @@ const Login = () => {
 
       if (response.data.success) {
         localStorage.setItem('token', response.data.data.token)
+        localStorage.setItem('user_id', response.data.data.id)
+
         dispatch(setUser(response.data.data))
         toast.success(response.data.message)
 

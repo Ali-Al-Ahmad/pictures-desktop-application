@@ -5,6 +5,7 @@ import Login from './pages/Login/Login'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Navbar from './components/Navbar/Navbar'
 import Upload from './pages/Upload/Upload'
+import Chats from './pages/Chats/Chats'
 
 function App() {
   // const ipcHandle = () => window.electron.ipcRenderer.send('ping')
@@ -19,6 +20,7 @@ function App() {
         <Route element={<ProtectedRoutes />}>
           <Route path="/home" element={<Home />} />
           <Route path="/upload" element={<Upload />} />
+          <Route path="/chats" element={<Chats />} />
         </Route>
       </Routes>
     </>
