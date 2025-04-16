@@ -32,10 +32,17 @@ io.on('connection', (socket) => {
   console.log('New client connected:', socket.id)
 
   socket.on('send-message', async (data) => {
+    const user = await User.findByPk(data?.user_id)
+    if (!user) {
+      console.log('user not found')
+      return
+    }
     const saved = await Chat.create({
       user_id: data.user_id,
       message: data.message,
     })
+    saved.dataValues.user = { email: user.email, full_name: user.full_name }
+    console.log('saved:', saved)
     io.emit('new-message', saved)
   })
 
